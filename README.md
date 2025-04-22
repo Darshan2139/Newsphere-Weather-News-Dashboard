@@ -2,6 +2,10 @@
 
 Newsphere is a personal dashboard that provides real-time weather updates and the latest news. It integrates OAuth authentication using Google and GitHub, allowing users to securely log in and access personalized features.
 
+## 🖥️Preview
+![Login Page](./Preview%20Images/Login%20Page.png)
+![Dashboard ](./Preview%20Images/Dashboard.png)
+
 ## 🚀Features
 
 - **Weather Updates**: Get real-time weather information for any city, including temperature, humidity, wind speed, and more.
@@ -78,11 +82,6 @@ Weather
 GET /api/weather/:city: Fetches weather data for the specified city.
 News
 GET /api/news/:category: Fetches news articles for the specified category.
-
-## 🖥️Screenshots
-![Login Page](./Preview%20Images/Login%20Page.png)
-![Dashboard ](./Preview%20Images/Dashboard.png)
-
 
 ## 🛠️Technologies Used
 
