@@ -1,8 +1,8 @@
-# Newsphere - Weather & News Dashboard
+# 📰🌤️Newsphere - Weather & News Dashboard
 
 Newsphere is a personal dashboard that provides real-time weather updates and the latest news. It integrates OAuth authentication using Google and GitHub, allowing users to securely log in and access personalized features.
 
-## Features
+## 🚀Features
 
 - **Weather Updates**: Get real-time weather information for any city, including temperature, humidity, wind speed, and more.
 - **News Headlines**: Browse the latest news articles by category (e.g., General, Business, Technology, Sports, Entertainment).
@@ -10,7 +10,7 @@ Newsphere is a personal dashboard that provides real-time weather updates and th
 - **Responsive Design**: Optimized for both desktop and mobile devices.
 - **Secure Backend**: Includes rate limiting, helmet for security headers, and session management.
 
-## Project Structure
+## 📁Project Structure
 
 ### Key Files
 
@@ -19,7 +19,7 @@ Newsphere is a personal dashboard that provides real-time weather updates and th
 - **`public/app.js`**: JavaScript file for handling frontend logic, including authentication, weather, and news API integration.
 - **`.env`**: Environment variables for configuration (e.g., API keys, OAuth credentials).
 
-## Installation
+## ⚙️Installation
 
 1. Clone the repository:
    ```bash
@@ -56,7 +56,7 @@ NEWS_API_KEY=<your-newsapi-key>
 
 5. Replace the JWT_SECRET value in the .env file with the generated secret.:
    ```bash
-## Usage
+## 🗂️Usage
 
 1. Start the server:
 
@@ -69,7 +69,7 @@ NEWS_API_KEY=<your-newsapi-key>
 
 3. Log in using Google or GitHub to access the dashboard.
 
-## API Endpoints
+## 🌐API Endpoints
 ### Authentication
 GET /auth/google: Initiates Google OAuth login.
 GET /auth/github: Initiates GitHub OAuth login.
@@ -79,11 +79,12 @@ GET /api/weather/:city: Fetches weather data for the specified city.
 News
 GET /api/news/:category: Fetches news articles for the specified category.
 
-##Screenshots
-![LoginPage](./Preview Images/Login Page.png)
-![Dashboard](./Preview Images/Dashboard.png)
+## 🖥️Screenshots
+![Login Page](./Preview%20Images/Login%20Page.png)
+![Dashboard ](./Preview%20Images/Dashboard.png)
 
-## Technologies Used
+
+## 🛠️Technologies Used
 
 - **Frontend:** HTML, CSS, JavaScript, Bootstrap  
 - **Backend:** Node.js, Express.js  
@@ -91,17 +92,17 @@ GET /api/news/:category: Fetches news articles for the specified category.
 - **Authentication:** Passport.js (Google & GitHub OAuth)  
 - **APIs:** OpenWeatherMap, NewsAPI  
 
-## Security Features
+## 🛡️Security Features
 
 - **Helmet:** Adds security headers to protect against common vulnerabilities.  
 - **Rate Limiting:** Limits the number of requests per IP to prevent abuse.  
 - **Session Management:** Securely manages user sessions with `express-session`.
 
-## License
+## 📌License
 
 This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
 
-## Acknowledgments
+## 🙌Acknowledgments
 
 - [OpenWeatherMap API](https://openweathermap.org/api)  
 - [NewsAPI](https://newsapi.org/)  
