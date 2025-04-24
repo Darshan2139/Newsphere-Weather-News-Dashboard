@@ -38,7 +38,7 @@ Newsphere is a personal dashboard that provides real-time weather updates and th
    npm install
    ```
 3. Create a .env file in the root directory and configure the following variables::
-   ```bash
+  
 ### Environment Variables
 
 Create a `.env` file in the root directory and add the following variables:
