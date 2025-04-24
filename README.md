@@ -62,7 +62,6 @@ NEWS_API_KEY=<your-newsapi-key>
    node generate-secret.js
 
 5. Replace the JWT_SECRET value in the .env file with the generated secret.:
-   ```bash
 ---
 ## 🗂️Usage
 
@@ -114,5 +113,5 @@ This project is licensed under the MIT License. See the [LICENSE](./LICENSE) fil
 ---
 ## 🌐 Connect With Us
 
-- GitHub: [github.com/Darshan2139/WalletX](https://github.com/Darshan2139/WalletX)
+- GitHub: [github.com/Darshan2139](https://github.com/Darshan2139/Newsphere-Weather-News-Dashboard)
 - Email: darshankachhiya.ce@gmail.com
