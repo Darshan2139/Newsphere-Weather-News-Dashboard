@@ -88,8 +88,8 @@ GET /api/news/:category: Fetches news articles for the specified category.
 
 ## 🛠️Technologies Used
 
-- **Frontend:** HTML, CSS, JavaScript, Bootstrap  
-- **Backend:** Node.js, Express.js  
+- **Frontend:** HTML, CSS, JavaScript.
+- **Backend:** Node.js.  
 - **Database:** MongoDB  
 - **Authentication:** Passport.js (Google & GitHub OAuth)  
 - **APIs:** OpenWeatherMap, NewsAPI  
@@ -99,10 +99,6 @@ GET /api/news/:category: Fetches news articles for the specified category.
 - **Helmet:** Adds security headers to protect against common vulnerabilities.  
 - **Rate Limiting:** Limits the number of requests per IP to prevent abuse.  
 - **Session Management:** Securely manages user sessions with `express-session`.
----
-## 📌License
-
-This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
 ---
 ## 🙌Acknowledgments
 
