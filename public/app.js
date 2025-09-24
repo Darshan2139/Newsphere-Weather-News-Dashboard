@@ -12,6 +12,13 @@ const weatherWind = document.getElementById('weatherWind');
 const weatherHumidity = document.getElementById('weatherHumidity');
 const weatherPressure = document.getElementById('weatherPressure');
 const weatherVisibility = document.getElementById('weatherVisibility');
+const unitToggle = document.getElementById('unitToggle');
+const weatherFeelsLike = document.getElementById('weatherFeelsLike');
+const weatherMinMax = document.getElementById('weatherMinMax');
+const weatherClouds = document.getElementById('weatherClouds');
+const weatherRain = document.getElementById('weatherRain');
+const weatherSunrise = document.getElementById('weatherSunrise');
+const weatherSunset = document.getElementById('weatherSunset');
 const newsResults = document.getElementById('newsResults');
 const categoryButtons = document.querySelector('.category-buttons');
 const logoutBtn = document.getElementById('logoutBtn');
@@ -21,13 +28,13 @@ const toast = new bootstrap.Toast(document.querySelector('.toast'));
 const toastBody = document.querySelector('.toast-body');
 
 // Add event listeners for OAuth buttons
-document.getElementById('googleLogin').addEventListener('click', () => {
+document.querySelectorAll('#googleLogin, .js-google-login').forEach(btn => btn.addEventListener('click', () => {
     window.location.href = '/auth/google';
-});
+}));
 
-document.getElementById('githubLogin').addEventListener('click', () => {
+document.querySelectorAll('#githubLogin, .js-github-login').forEach(btn => btn.addEventListener('click', () => {
     window.location.href = '/auth/github';
-});
+}));
 
 // Add logout functionality
 logoutBtn.addEventListener('click', async () => {
@@ -37,9 +44,9 @@ logoutBtn.addEventListener('click', async () => {
             showToast('success', 'Logged out successfully');
             setTimeout(() => {
                 showAuthSection();
-                weatherResults.style.display = 'none';
+                weatherResults.classList.add('is-hidden');
                 newsResults.innerHTML = '';
-            }, 1000);
+            }, 800);
         } else {
             throw new Error('Logout failed');
         }
@@ -93,21 +100,39 @@ async function checkAuthStatus() {
 }
 
 function showMainContent() {
-    authSection.style.display = 'none';
-    mainContent.style.display = 'block';
-    logoutBtn.style.display = 'block';
-    weatherResults.style.display = 'block';  // Show weather container
+    authSection.classList.add('is-hidden');
+    const hero = document.getElementById('heroSection');
+    if (hero) hero.classList.add('is-hidden');
+    mainContent.classList.remove('is-hidden');
+    logoutBtn.classList.remove('is-hidden');
     mainContent.style.opacity = '0';
     setTimeout(() => {
         mainContent.style.transition = 'opacity 0.5s ease';
         mainContent.style.opacity = '1';
+        // ensure viewport focuses on content after login
+        mainContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
 }
 
 function showAuthSection() {
-    authSection.style.display = 'block';
-    mainContent.style.display = 'none';
-    logoutBtn.style.display = 'none';
+    const hero = document.getElementById('heroSection');
+    if (hero) hero.classList.remove('is-hidden');
+    authSection.classList.remove('is-hidden');
+    mainContent.classList.add('is-hidden');
+    logoutBtn.classList.add('is-hidden');
+}
+
+let lastWeatherData = null;
+
+// Unit toggle
+if (unitToggle) {
+    unitToggle.addEventListener('click', () => {
+        const next = unitToggle.dataset.unit === 'C' ? 'F' : 'C';
+        unitToggle.dataset.unit = next;
+        unitToggle.setAttribute('aria-pressed', String(next === 'F'));
+        unitToggle.textContent = next === 'F' ? '°F' : '°C';
+        if (lastWeatherData) displayWeatherInfo(lastWeatherData);
+    });
 }
 
 // Weather functionality
@@ -123,6 +148,7 @@ weatherForm.addEventListener('submit', async (e) => {
             throw new Error(await response.text());
         }
         const data = await response.json();
+        lastWeatherData = data;
         displayWeatherInfo(data);
         cityInput.value = '';
     } catch (error) {
@@ -133,19 +159,40 @@ weatherForm.addEventListener('submit', async (e) => {
     }
 });
 
+function toF(c) { return Math.round((c * 9) / 5 + 32); }
 function displayWeatherInfo(data) {
-    weatherResults.style.display = 'block';
+    weatherResults.classList.remove('is-hidden');
     const iconUrl = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
-    
+
+    // Helper to format city local time using API timezone offset
+    const localOffsetMs = -new Date().getTimezoneOffset() * 60000;
+    const toCityDate = (unixSeconds) => new Date(unixSeconds * 1000 + (data.timezone || 0) * 1000 - localOffsetMs);
+    const fmtTime = (d) => d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
     weatherCity.textContent = `${data.name}, ${data.sys.country}`;
     weatherIcon.src = iconUrl;
     weatherIcon.alt = data.weather[0].description;
-    weatherTemp.textContent = `${Math.round(data.main.temp)}°C`;
+    const useF = unitToggle && unitToggle.dataset.unit === 'F';
+    const t = Math.round(data.main.temp);
+    weatherTemp.textContent = useF ? `${toF(t)}°F` : `${t}°C`;
     weatherDesc.textContent = data.weather[0].description;
+
     weatherWind.textContent = ` ${data.wind.speed} m/s`;
     weatherHumidity.textContent = ` ${data.main.humidity}%`;
     weatherPressure.textContent = ` ${data.main.pressure} hPa`;
     weatherVisibility.textContent = ` ${(data.visibility / 1000).toFixed(1)} km`;
+
+    if (weatherFeelsLike) weatherFeelsLike.textContent = ` ${unitToggle && unitToggle.dataset.unit === 'F' ? toF(data.main.feels_like) + '°F' : Math.round(data.main.feels_like) + '°C'}`;
+    if (weatherMinMax) weatherMinMax.textContent = ` ${unitToggle && unitToggle.dataset.unit === 'F' ? toF(data.main.temp_min) + '°' : Math.round(data.main.temp_min) + '°'} / ${unitToggle && unitToggle.dataset.unit === 'F' ? toF(data.main.temp_max) + '°F' : Math.round(data.main.temp_max) + '°C'}`;
+    if (weatherClouds) weatherClouds.textContent = ` ${data.clouds?.all ?? 0}%`;
+
+    const rain1h = data.rain?.['1h'];
+    const rain3h = data.rain?.['3h'];
+    const rainText = rain1h ? `${rain1h} mm (1h)` : rain3h ? `${rain3h} mm (3h)` : ' No rain';
+    if (weatherRain) weatherRain.textContent = ` ${rainText}`;
+
+    if (weatherSunrise) weatherSunrise.textContent = ` ${fmtTime(toCityDate(data.sys.sunrise))}`;
+    if (weatherSunset) weatherSunset.textContent = ` ${fmtTime(toCityDate(data.sys.sunset))}`;
 }
 
 // News functionality
@@ -182,14 +229,17 @@ function displayNewsData(data) {
 
     data.articles.forEach(article => {
         if (!article.title || !article.description) return;
-        
         const newsCard = document.createElement('div');
         newsCard.className = 'news-item';
+
+        const thumb = article.urlToImage ? `<img class="news-thumb" src="${article.urlToImage}" alt="${article.title}">` : '';
+
         newsCard.innerHTML = `
+            ${thumb}
             <h5 class="card-title">${article.title}</h5>
             <p class="card-text">${article.description}</p>
             <div class="d-flex justify-content-between align-items-center">
-                <small class="text-muted">${new Date(article.publishedAt).toLocaleDateString()}</small>
+                <small class="text-muted">${new Date(article.publishedAt).toLocaleDateString()} • ${article.source?.name || ''}</small>
                 <a href="${article.url}" target="_blank" class="btn btn-sm btn-primary">Read More</a>
             </div>
         `;
@@ -219,6 +269,25 @@ function setLoading(element, isLoading) {
             element.dataset.originalText = originalText;
         }
         element.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
+
+        // Show skeletons for news category loads
+        if (element.dataset && element.dataset.category) {
+            const skeletonCount = 6;
+            let skeletons = '';
+            for (let i = 0; i < skeletonCount; i++) {
+                skeletons += `
+                <div class="news-item skeleton">
+                    <div class="skeleton-block mb-3"></div>
+                    <div class="skeleton-bar mb-2"></div>
+                    <div class="skeleton-bar w-75 mb-3"></div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="skeleton-bar w-25"></div>
+                        <div class="skeleton-bar w-25"></div>
+                    </div>
+                </div>`;
+            }
+            newsResults.innerHTML = skeletons;
+        }
     } else {
         element.classList.remove('disabled');
         element.innerHTML = element.dataset.originalText || element.innerHTML;
@@ -228,4 +297,4 @@ function setLoading(element, isLoading) {
 // Save original button text
 document.querySelectorAll('button').forEach(button => {
     button.dataset.originalText = button.innerHTML;
-}); 
+});
