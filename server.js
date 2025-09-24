@@ -12,6 +12,13 @@ const GitHubStrategy = require('passport-github2').Strategy;
 const MongoStore = require('connect-mongo');
 
 const app = express();
+// Trust reverse proxy (Render/Heroku) so secure cookies work behind proxy
+app.set('trust proxy', 1);
+
+// Base URL helpers for OAuth callbacks on Render/production
+const BASE_URL = process.env.BASE_URL || process.env.RENDER_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`;
+const GOOGLE_CALLBACK = process.env.GOOGLE_CALLBACK_URL || `${BASE_URL}/auth/google/callback`;
+const GITHUB_CALLBACK = process.env.GITHUB_CALLBACK_URL || `${BASE_URL}/auth/github/callback`;
 
 // Function to create session configuration
 const createSessionConfig = () => {
@@ -177,7 +184,7 @@ passport.deserializeUser(async (id, done) => {
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: process.env.GOOGLE_CALLBACK_URL
+    callbackURL: GOOGLE_CALLBACK
 }, async (accessToken, refreshToken, profile, done) => {
     try {
         let user = await User.findOne({ googleId: profile.id });
@@ -199,7 +206,7 @@ passport.use(new GoogleStrategy({
 passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: 'http://localhost:3000/auth/github/callback'
+    callbackURL: GITHUB_CALLBACK
 }, async (accessToken, refreshToken, profile, done) => {
     try {
         let user = await User.findOne({ githubId: profile.id });
@@ -321,6 +328,11 @@ app.get('/', (req, res) => {
     res.sendFile('index.html', { root: 'public' });
 });
 
+// Health check for Render
+app.get('/healthz', (req, res) => {
+    res.status(200).json({ status: 'ok' });
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Error:', err);
@@ -361,8 +373,9 @@ const startServer = (port) => {
     const server = app.listen(port, () => {
         console.log(`Server is running on port ${port}`);
         console.log(`OAuth callback URLs:`);
-        console.log(`Google: ${process.env.GOOGLE_CALLBACK_URL}`);
-        console.log(`GitHub: ${process.env.GITHUB_CALLBACK_URL}`);
+        console.log(`Base URL: ${BASE_URL}`);
+        console.log(`Google: ${GOOGLE_CALLBACK}`);
+        console.log(`GitHub: ${GITHUB_CALLBACK}`);
     }).on('error', (err) => {
         if (err.code === 'EADDRINUSE') {
             console.log(`Port ${port} is busy, trying ${port + 1}`);
